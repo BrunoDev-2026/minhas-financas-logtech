@@ -84,7 +84,8 @@ const App = {
 
         const isOnline = await Api.checkStatus();
         if (!isOnline) {
-            console.warn('⚠️ Servidor offline. Operando em modo local.');
+            // Apenas loga no console uma vez de forma limpa
+            console.log('%cℹ️ Modo Local Ativo: Servidor não detectado.', 'color: #f59e0b; font-weight: bold;');
             return;
         }
 

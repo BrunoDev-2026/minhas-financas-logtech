@@ -85,11 +85,17 @@ const Utils = {
     // ─── Áudio ───────────────────────────────────────────────────────────────
 
     playSound: (path) => {
+        // Não toca sons se estiver no modo eco ou se o caminho for inválido
+        if (localStorage.getItem('financas_eco_mode') === 'true' || !path) return;
+        
         try {
             const audio = new Audio(path);
             audio.volume = 0.4;
-            audio.play().catch(() => {}); // Ignora erros silenciosamente
-        } catch {}
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => { /* Silencia erro de carregamento no console */ });
+            }
+        } catch (e) { /* Silencia erro de construção */ }
     },
 
     /** Feedback tátil para mobile */
