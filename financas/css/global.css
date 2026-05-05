@@ -639,7 +639,8 @@ main { flex: 1; padding: 2rem 0; }
 .social-link-icon {
   width: 18px;
   height: 18px;
-  stroke-width: 2px;
+  stroke: currentColor;
+  display: block;
 }
 
 .social-icon:hover {
