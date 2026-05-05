@@ -636,6 +636,12 @@ main { flex: 1; padding: 2rem 0; }
   transition: all var(--transition-fast);
 }
 
+.social-link-icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2px;
+}
+
 .social-icon:hover {
   background-color: var(--color-positive);
   color: white;
