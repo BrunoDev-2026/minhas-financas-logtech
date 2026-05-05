@@ -9,7 +9,8 @@ const STORAGE_KEYS = {
     CATEGORIES: 'financas_categories',
     FIXED_BILLS: 'financas_fixed_bills',
     SOUND_PREF: 'financas_sound_pref',
-    ECO_MODE: 'financas_eco_mode'
+    ECO_MODE: 'financas_eco_mode',
+    PROFILE: 'financas_profile'
 };
 
 const DEFAULT_CATEGORIES = [
@@ -153,6 +154,21 @@ const Storage = {
 
     getEcoMode: () => localStorage.getItem(STORAGE_KEYS.ECO_MODE) === 'true',
     saveEcoMode: (val) => localStorage.setItem(STORAGE_KEYS.ECO_MODE, val ? 'true' : 'false'),
+
+    // ─── Profile ─────────────────────────────────────────────────────────────
+
+    getProfile: () => {
+        try {
+            const data = localStorage.getItem(STORAGE_KEYS.PROFILE);
+            return data ? JSON.parse(data) : { name: 'Usuário', color: '#10b981', photo: null };
+        } catch {
+            return { name: 'Usuário', color: '#10b981', photo: null };
+        }
+    },
+
+    saveProfile: (profile) => {
+        localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
+    },
 
     // ─── Categories ──────────────────────────────────────────────────────────
 

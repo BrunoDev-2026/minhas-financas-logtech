@@ -275,6 +275,142 @@ ul { list-style: none; }
 
 .input-with-icon .form-control { padding-left: 2.8rem !important; }
 
+/* ── Modais com Animação Suave ────────────────────────────────────────────── */
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex !important; /* Mantém o flex para o alinhamento */
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.modal {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(0.9);
+}
+
+.modal-overlay.active .modal {
+    transform: scale(1);
+}
+
+/* ── Perfil e Foto ───────────────────────────────────────────────────────── */
+
+.user-avatar-wrapper {
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: border-color var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar-wrapper:hover { border-color: var(--color-accent); }
+
+.user-avatar, .profile-photo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  color: #fff;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.profile-photo-circle {
+  width: 80px;
+  height: 80px;
+  font-size: 1.5rem;
+  margin-right: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-md);
+}
+
+.profile-preview-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-hover);
+  border-radius: var(--radius-md);
+}
+
+.preview-label { display: block; font-weight: 600; font-size: 0.9rem; }
+.preview-hint { display: block; font-size: 0.75rem; color: var(--text-secondary); }
+.label-optional { font-size: 0.7rem; opacity: 0.6; font-weight: normal; margin-left: 4px; }
+
+/* Color Picker */
+.color-picker { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.color-dot {
+  width: 28px; height: 28px; border-radius: 50%; border: 3px solid transparent;
+  cursor: pointer; transition: transform 0.2s, border-color 0.2s;
+  padding: 0;
+}
+.color-dot.selected { border-color: #fff; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+
+/* Editor de Recorte (Estilo LinkedIn) */
+.crop-editor-overlay {
+  display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--bg-main); z-index: 110; flex-direction: column;
+  padding: 1.5rem; border-radius: var(--radius-lg);
+}
+.crop-editor-overlay.open { display: flex; animation: fadeIn 0.3s ease; }
+.crop-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.crop-viewport-container {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  background: #000; border-radius: var(--radius-md); overflow: hidden;
+  position: relative; margin-bottom: 1rem;
+}
+.crop-viewport {
+  width: 280px; height: 280px; position: relative; cursor: move; touch-action: none;
+}
+#cropImage { position: absolute; max-width: none; user-select: none; pointer-events: none; }
+.crop-mask {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; border-radius: 50%;
+  box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--color-accent);
+  box-sizing: border-box;
+}
+
+.crop-controls { display: flex; flex-direction: column; gap: 1rem; }
+.zoom-control { display: flex; align-items: center; gap: 12px; }
+.zoom-control input[type="range"] {
+  flex: 1; height: 6px; border-radius: 5px; appearance: none;
+  background: var(--bg-hover); outline: none;
+}
+.zoom-control input::-webkit-slider-thumb {
+  appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--color-positive); cursor: pointer; border: 2px solid #fff;
+}
+
+.btn-text { background: none; border: none; cursor: pointer; font-family: var(--font-family); font-weight: 500; }
+
 /* ── Header ───────────────────────────────────────────────────────────────── */
 
 header {
@@ -657,4 +793,3 @@ main { flex: 1; padding: 2rem 0; }
     text-align: center;
   }
 }
-

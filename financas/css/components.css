@@ -73,6 +73,212 @@
   display: flex;
 }
 
+/* Avatar & Profile */
+.user-avatar-wrapper {
+  cursor: pointer;
+  margin-right: 1.25rem;
+  transition: all var(--transition);
+  position: relative;
+  z-index: 10;
+}
+
+.user-avatar-wrapper:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 10px var(--color-positive));
+}
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-positive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1rem;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-size: cover;
+  background-position: center;
+  transition: all 0.3s ease;
+}
+
+.profile-preview-container {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.profile-photo-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--color-positive);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.profile-photo-circle:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.preview-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.preview-hint {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.color-picker {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+
+.color-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.color-dot:hover,
+.color-dot.selected {
+  border-color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Crop Editor Overlay (LinkedIn Style) */
+.crop-editor-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.98);
+  z-index: 300;
+  display: none;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(20px);
+  animation: modalUp 0.3s ease-out;
+}
+
+.crop-editor-overlay.open {
+  display: flex;
+}
+
+.crop-editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.crop-editor-header h3 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.1rem;
+  color: var(--text-main);
+}
+
+.crop-viewport-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  background: #000;
+  border-radius: var(--radius-md);
+  touch-action: none;
+}
+
+.crop-viewport {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  cursor: move;
+}
+
+.crop-viewport img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: 0 0;
+}
+
+.crop-mask {
+  position: absolute;
+  inset: -1000px;
+  border: 1000px solid rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.crop-controls {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.zoom-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+#zoomRange {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  outline: none;
+}
+
+#zoomRange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--color-positive);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Forms & Inputs */
 .form-group {
   margin-bottom: 1.25rem;
