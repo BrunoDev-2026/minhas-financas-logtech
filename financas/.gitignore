@@ -1,0 +1,3 @@
+# Arquivos de ambiente com credenciais
+.env
+/node_modules

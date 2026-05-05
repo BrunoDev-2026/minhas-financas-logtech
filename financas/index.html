@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a23">
+    <title>Minhas Finanças — MB Tech</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/global.css?v=2.1">
+    <link rel="stylesheet" href="css/components.css?v=2.1">
+    <link rel="stylesheet" href="css/dashboard.css?v=2.1">
+
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+</head>
+<body>
+
+<!-- Fundo animado -->
+<canvas id="starCanvas"></canvas>
+<div class="scanline"></div>
+
+<!-- ═══════════════════════════════════════════════════════════ HEADER ══ -->
+<header>
+    <div class="container header-content">
+
+        <!-- Logo + Marca -->
+        <div class="brand">
+            <div class="brand-logo-wrapper">
+                <img src="assets/images/Logo.png" alt="MB Tech Logo" class="brand-logo-img">
+            </div>
+            <div class="brand-text-wrapper">
+                <div class="brand-name-block">
+                    <span class="brand-name-top">Minhas</span>
+                    <span class="brand-name-bottom">Finanças</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações do header -->
+        <div class="header-actions">
+            <div class="header-primary-group">
+                <!-- Filtro de mês -->
+                <input
+                    type="text"
+                    id="inputMonthFilter"
+                    class="form-control flatpickr-month"
+                    placeholder="Mês"
+                    style="width:140px;"
+                    readonly
+                >
+                <!-- Nova transação -->
+                <button class="btn btn-primary btn-with-icon" id="btnNovaTransacao">
+                    <i data-lucide="plus" class="icon-btn"></i>
+                    <span class="btn-text">Nova</span>
+                </button>
+            </div>
+
+            <!-- Filtro de tipo com indicador visual -->
+            <div class="filter-indicator-wrapper">
+                <i id="typeFilterIndicator" data-lucide="chevrons-up-down" class="filter-indicator icon-secondary"></i>
+                <select id="inputTransactionTypeFilter" class="form-control" style="width:115px;">
+                    <option value="all">Todos</option>
+                    <option value="income">Entradas</option>
+                    <option value="expense">Saídas</option>
+                </select>
+            </div>
+
+            <!-- Limpar filtros -->
+            <button class="btn btn-secondary" id="btnClearFilters" title="Limpar filtros">
+                <i data-lucide="eraser" class="icon-btn"></i>
+            </button>
+
+            <!-- Exportar CSV -->
+            <button class="btn btn-secondary" id="btnExportCSV" title="Exportar CSV">
+                <i data-lucide="download" class="icon-btn"></i>
+            </button>
+
+            <!-- Exportar PDF -->
+            <button class="btn btn-secondary" id="btnExportPDF" title="Exportar PDF">
+                <i data-lucide="file-text" class="icon-btn"></i>
+            </button>
+
+            <!-- Imprimir Relatório -->
+            <button class="btn btn-secondary" id="btnPrintReport" title="Imprimir Relatório">
+                <i data-lucide="printer" class="icon-btn"></i>
+            </button>
+
+            <!-- Privacidade -->
+            <button class="btn btn-secondary" id="btnPrivacidade" title="Modo privacidade">
+                <i data-lucide="lock" id="iconPrivacidade" class="icon-btn"></i>
+            </button>
+
+            <!-- Modo Eco -->
+            <button class="btn btn-secondary" id="btnEco" title="Modo Eco (Economia de Bateria)">
+                <i data-lucide="leaf" id="iconEco" class="icon-btn"></i>
+            </button>
+
+            <!-- Alternar Tema -->
+            <button class="btn btn-secondary" id="btnTheme" title="Alternar tema">
+                <i data-lucide="sun" id="iconTheme" class="icon-btn"></i>
+            </button>
+
+            <!-- Meta de gastos -->
+            <button class="btn btn-secondary" id="btnDefinirMeta" title="Meta de gastos">
+                <i data-lucide="target" class="icon-btn"></i>
+            </button>
+
+        </div>
+    </div>
+</header>
+<!-- ═══════════════════════════════════════════════════════════ /HEADER ══ -->
+
+<main class="container">
+
+    <!-- ╔══════════════════════════════════════ CARDS DE RESUMO ══════════╗ -->
+    <div class="metrics-grid">
+
+        <!-- Saldo Total -->
+        <div class="card col-span-4">
+            <div class="skeleton-wrapper">
+                <div class="card-header">
+                    <span class="card-title">Saldo Total</span>
+                    <div class="card-icon balance">
+                        <i data-lucide="wallet" class="icon-card"></i>
+                    </div>
+                </div>
+                <div class="card-amount" id="valSaldo">R$ 0,00</div>
+            </div>
+            <div class="card-sparkline" style="height: 30px; margin-top: 5px;">
+                <canvas id="sparkSaldo"></canvas>
+            </div>
+            <div class="card-trend text-secondary">Balanço do mês atual</div>
+        </div>
+
+        <!-- Entradas -->
+        <div class="card col-span-4">
+            <div class="skeleton-wrapper">
+                <div class="card-header">
+                    <span class="card-title">Entradas</span>
+                    <div class="card-icon income">
+                        <i data-lucide="trending-up" class="icon-card"></i>
+                    </div>
+                </div>
+                <div class="card-amount positive" id="valEntradas">R$ 0,00</div>
+            </div>
+            <div class="card-sparkline" style="height: 30px; margin-top: 5px;">
+                <canvas id="sparkEntradas"></canvas>
+            </div>
+            <div class="card-trend text-secondary">Receitas no período</div>
+        </div>
+
+        <!-- Saídas -->
+        <div class="card col-span-4">
+            <div class="skeleton-wrapper">
+                <div class="card-header">
+                    <span class="card-title">Saídas</span>
+                    <div class="card-icon expense">
+                        <i data-lucide="trending-down" class="icon-card"></i>
+                    </div>
+                </div>
+                <div class="card-amount negative" id="valSaidas">R$ 0,00</div>
+            </div>
+            <div class="card-sparkline" style="height: 30px; margin-top: 5px;">
+                <canvas id="sparkSaidas"></canvas>
+            </div>
+            <div class="card-trend text-secondary">Despesas no período</div>
+        </div>
+
+        <!-- Economia Mensal -->
+        <div class="card col-span-4">
+            <div class="skeleton-wrapper">
+                <div class="card-header">
+                    <span class="card-title">Economia Mensal</span>
+                    <div class="card-icon savings" id="iconEconomia">
+                        <i data-lucide="piggy-bank" class="icon-card"></i>
+                    </div>
+                </div>
+                <div class="card-amount" id="valEconomia">R$ 0,00</div>
+            </div>
+            <div class="card-sparkline" style="height: 30px; margin-top: 5px;">
+                <canvas id="sparkEconomia"></canvas>
+            </div>
+            <div class="card-trend text-secondary">Entradas − Saídas</div>
+        </div>
+
+        <!-- % de Economia -->
+        <div class="card col-span-4">
+            <div class="skeleton-wrapper">
+                <div class="card-header" style="margin-bottom: 0.5rem;">
+                    <span class="card-title">% de Economia</span>
+                    <div class="card-icon savings">
+                        <i data-lucide="percent" class="icon-card"></i>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="card-amount" id="valPercentualEconomia">0%</div>
+                    <div style="width: 50px; height: 50px; position: relative;">
+                        <canvas id="chartHealth"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="card-sparkline" style="height: 30px; margin-top: 5px;">
+                <canvas id="sparkPerc"></canvas>
+            </div>
+            <div class="card-trend text-secondary">Eficiência da receita</div>
+        </div>
+
+        <!-- Previsão de Gastos -->
+        <div class="card col-span-4">
+            <div class="skeleton-wrapper">
+                <div class="card-header">
+                    <span class="card-title">Previsão de Gastos</span>
+                    <div class="card-icon expense">
+                        <i data-lucide="zap" class="icon-card"></i>
+                    </div>
+                </div>
+                <div class="card-amount" id="valPrevisao">R$ 0,00</div>
+            </div>
+            <div class="card-sparkline" style="height: 30px; margin-top: 5px;">
+                <canvas id="sparkPrevisao"></canvas>
+            </div>
+            <div class="card-trend text-secondary">Estimado p/ fim do mês</div>
+        </div>
+
+    </div>
+    <!-- ╚══════════════════════════════════════ /CARDS DE RESUMO ════════╝ -->
+
+
+    <!-- ╔════════════════════════════════ SEÇÕES ANALÍTICAS ══════════════╗ -->
+    <div class="dashboard-grid">
+
+        <!-- Lado esquerdo: Gráficos -->
+        <div class="col-span-8" style="display:flex;flex-direction:column;gap:1.5rem;">
+
+            <!-- Evolução 6 meses -->
+            <div class="card" id="cardEvolucao">
+                <div class="section-header" id="headerEvolucao" style="cursor: pointer;">
+                    <h2 class="section-title">
+                        <i data-lucide="line-chart" class="icon-section"></i> Evolução Financeira</h2>
+                    <i data-lucide="chevron-down" class="toggle-icon"></i>
+                </div>
+                <div class="collapsible-content">
+                    <div class="chart-container">
+                        <canvas id="chartComparativo"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Despesas por categoria -->
+            <div class="card" id="cardCategorias">
+                <div class="section-header" id="headerCategorias" style="cursor: pointer; margin-bottom:0; padding-bottom: 1rem;">
+                    <h2 class="section-title">
+                        <i data-lucide="pie-chart" class="icon-section"></i> Despesas por Categoria</h2>
+                    <i data-lucide="chevron-down" class="toggle-icon"></i>
+                </div>
+                <div class="collapsible-content">
+                    <div class="chart-container">
+                        <canvas id="chartDespesas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalhamento da Meta -->
+            <div class="card" id="cardGoal">
+                <div class="section-header" id="headerGoal" style="cursor: pointer; margin-bottom: 0; padding-bottom: 1rem;">
+                    <h2 class="section-title">
+                        <i data-lucide="target" class="icon-section"></i> Detalhamento da Meta</h2>
+                    <i data-lucide="chevron-down" class="toggle-icon"></i>
+                </div>
+                <div class="goal-accordion-body collapsible-content">
+                    <div class="goal-grid-layout">
+                        <div class="goal-table-container">
+                            <table class="goal-table">
+                                <thead>
+                                    <tr>
+                                        <th>Indicador</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                        <th style="text-align: right;">Progresso</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="goalTableBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="gauge-section">
+                            <div class="gauge-canvas-wrapper">
+                                <canvas id="chartGauge"></canvas>
+                            </div>
+                            <div id="gaugeText" class="gauge-label-overlay">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Lado direito: Sidebar -->
+        <div class="col-span-4" style="display:flex;flex-direction:column;gap:1.5rem;">
+
+            <!-- Contas Fixas -->
+            <div class="card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i data-lucide="credit-card" class="icon-section"></i> Contas Fixas</h2>
+                    <button class="btn btn-primary" id="btnNovaContaFixa"
+                        style="padding:0.35rem 0.75rem;font-size:0.8rem;">
+                        + Nova
+                    </button>
+                </div>
+                <div class="transaction-list" id="billsList"></div>
+            </div>
+
+            <!-- Histórico de pagas -->
+            <div class="card">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i data-lucide="check-circle" class="icon-section"></i> Pagas este mês</h2>
+                </div>
+                <div id="paidHistoryList"></div>
+            </div>
+
+            <!-- Lista de transações -->
+            <div class="card" id="cardTransacoes">
+                <div class="section-header" id="headerTransacoes" style="cursor: pointer; flex-direction:column; align-items:flex-start; gap:0.5rem;">
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                        <h2 class="section-title">
+                            <i data-lucide="history" class="icon-section"></i> Transações</h2>
+                        <i data-lucide="chevron-down" class="toggle-icon"></i>
+                    </div>
+                    <div style="display:flex;align-items:center;width:100%;gap:0.5rem;" onclick="event.stopPropagation()">
+                        <span id="searchCount" class="text-secondary"
+                            style="font-size:0.7rem;color:var(--color-accent);white-space:nowrap;"></span>
+                        <input
+                            type="text"
+                            id="inputSearchTx"
+                            class="form-control"
+                            placeholder="🔍 Buscar transação..."
+                            style="padding:0.4rem 0.8rem;flex:1;"
+                        >
+                    </div>
+                </div>
+                <div class="transaction-list collapsible-content" id="transactionsList"></div>
+            </div>
+
+        </div>
+    </div>
+    <!-- ╚════════════════════════════════ /GRÁFICOS + SIDEBAR ═══════════╝ -->
+
+</main>
+
+<!-- ═══════════════════════════════════════════════ MODAIS ════════════════ -->
+
+<!-- Modal: Nova / Editar Transação -->
+<div class="modal-overlay" id="modalTransacao">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTransacaoTitle">Nova Transação</h2>
+            <button class="modal-close" id="modalTransacaoClose" aria-label="Fechar">×</button>
+        </div>
+        <form id="formTransacao" novalidate>
+            <input type="hidden" id="txId">
+
+            <div class="modal-grid">
+
+                <!-- Tipo: Entrada / Saída -->
+                <div class="form-group col-span-2">
+                    <label class="form-label">Tipo de Transação</label>
+                    <div class="type-toggle-group">
+                        <label>
+                            <input type="radio" name="txType" value="expense" checked style="display:none">
+                            <div class="type-toggle-item expense">
+                                <i data-lucide="trending-down" class="icon-secondary" style="vertical-align:middle;"></i>
+                                Saída / Despesa
+                            </div>
+                        </label>
+                        <label>
+                            <input type="radio" name="txType" value="income" style="display:none">
+                            <div class="type-toggle-item income">
+                                <i data-lucide="trending-up" class="icon-secondary" style="vertical-align:middle;"></i>
+                                Entrada / Receita
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Descrição -->
+                <div class="form-group col-span-2">
+                    <label class="form-label" for="inputDescricao">Descrição *</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon"><i data-lucide="file-text" style="width:16px;height:16px;"></i></span>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="inputDescricao"
+                            placeholder="Ex: Compras no mercado"
+                            required
+                            autocomplete="off"
+                            maxlength="100"
+                        >
+                    </div>
+                </div>
+
+                <!-- Valor -->
+                <div class="form-group">
+                    <label class="form-label" for="inputValor">Valor (R$) *</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon"><i data-lucide="banknote" style="width:16px;height:16px;"></i></span>
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            class="form-control"
+                            id="inputValor"
+                            placeholder="0,00"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Data -->
+                <div class="form-group">
+                    <label class="form-label" for="inputData">Data *</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon"><i data-lucide="calendar" style="width:16px;height:16px;"></i></span>
+                        <input
+                            type="date"
+                            class="form-control flatpickr-date"
+                            id="inputData"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Categoria -->
+                <div class="form-group col-span-2">
+                    <label class="form-label" for="inputCategoria">Categoria *</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon"><i data-lucide="tag" style="width:16px;height:16px;"></i></span>
+                        <select class="form-control" id="inputCategoria" required></select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnTransacaoCancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="save" class="icon-btn"></i>
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Definir Meta -->
+<div class="modal-overlay" id="modalMeta">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title"><i data-lucide="target" class="icon-section"></i> Meta de Gastos</h2>
+            <button class="modal-close" id="modalMetaClose" aria-label="Fechar"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formMeta" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="inputMetaValor">Limite Mensal (R$)</label>
+                <div class="input-with-icon">
+                    <span class="input-icon"><i data-lucide="dollar-sign" style="width:16px;height:16px;"></i></span>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="1"
+                        class="form-control"
+                        id="inputMetaValor"
+                        placeholder="3000,00"
+                        required
+                    >
+                </div>
+                <p class="text-secondary" style="font-size:0.78rem;margin-top:0.3rem;">
+                    Define o limite de saídas para alertas e projeções.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnMetaCancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Meta</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Nova Conta Fixa -->
+<div class="modal-overlay" id="modalConta">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title"><i data-lucide="calendar" class="icon-section"></i> Nova Conta Fixa</h2>
+            <button class="modal-close" id="modalContaClose" aria-label="Fechar"><i data-lucide="x"></i></button>
+        </div>
+        <form id="formConta" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="inputContaNome">Nome da Conta *</label>
+                <div class="input-with-icon">
+                    <span class="input-icon"><i data-lucide="file-text" style="width:16px;height:16px;"></i></span>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="inputContaNome"
+                        placeholder="Ex: Aluguel, Internet..."
+                        required
+                        maxlength="60"
+                    >
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="inputContaValor">Valor (R$) *</label>
+                <div class="input-with-icon">
+                    <span class="input-icon"><i data-lucide="banknote" style="width:16px;height:16px;"></i></span>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        class="form-control"
+                        id="inputContaValor"
+                        placeholder="0,00"
+                        required
+                    >
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="inputContaDia">Dia do Vencimento *</label>
+                <div class="input-with-icon">
+                    <span class="input-icon"><i data-lucide="calendar-days" style="width:16px;height:16px;"></i></span>
+                    <input
+                        type="number"
+                        min="1"
+                        max="31"
+                        class="form-control"
+                        id="inputContaDia"
+                        placeholder="Ex: 5"
+                        required
+                    >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnContaCancelar">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ FOOTER ═══════════ -->
+<footer class="footer">
+    <div class="container footer-content">
+        <div class="footer-left">
+            <p>© 2026 MBTech Finanças — Desenvolvido por Bruno David</p>
+        </div>
+        <div class="footer-right">
+            <div class="social-links">
+                <a href="https://github.com/BrunoDev-2026" target="_blank" class="social-icon" title="GitHub">
+                    <i data-lucide="github"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/bruno-david-de-oliveira-buchardt-721643246" target="_blank" class="social-icon" title="LinkedIn">
+                    <i data-lucide="linkedin"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════════════════════════════════════ SCRIPTS ══════════ -->
+
+<!-- Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<!-- Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
+
+<!-- App scripts (ordem de dependência) -->
+<script src="js/api.js?v=2.1"></script>
+<script src="js/particles.js?v=2.1"></script>
+
+<script src="js/storage.js?v=2.1"></script>
+<script src="js/utils.js?v=2.1"></script>
+<script src="js/transactions.js?v=2.1"></script>
+<script src="js/charts.js?v=2.1"></script>
+<script src="js/app.js?v=2.1"></script>
+
+</body>
+</html>
